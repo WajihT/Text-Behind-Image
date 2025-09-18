@@ -243,8 +243,8 @@ const Page = () => {
       }
     }, [user])
     
-    // Show loading state while checking authentication
-    if (!user && session === null) {
+    // Show loading state while checking authentication (only when session is undefined, not null)
+    if (!user && session === undefined) {
         return (
             <div className='min-h-screen bg-background'>
                 <Navbar />

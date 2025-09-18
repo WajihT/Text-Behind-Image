@@ -8,6 +8,8 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface NavbarProps {
   // Optional props for authenticated user
@@ -30,6 +32,24 @@ const Navbar = ({
   showCreateControls = false
 }: NavbarProps) => {
   const pathname = usePathname();
+  const supabase = useSupabaseClient();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      toast({
+        title: "🔴 Error signing out",
+        description: "Please try again.",
+      });
+    } else {
+      toast({
+        title: "✅ Signed out successfully",
+        description: "You have been signed out of your account.",
+      });
+    }
+  };
 
   const navItems = [
     { href: '/', label: 'Home' },
@@ -136,6 +156,10 @@ const Navbar = ({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onOpenPayDialog}>
                     {currentUser?.paid ? 'Manage Plan' : 'Upgrade to Pro'}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
